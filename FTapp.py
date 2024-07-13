@@ -1,4 +1,4 @@
-# File: app.py
+# File: FTapp.py
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import os
@@ -141,5 +141,6 @@ def get_members():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    db.create_all()
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)

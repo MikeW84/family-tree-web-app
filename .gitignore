@@ -1,0 +1,20 @@
+# Ignore the virtual environment folder
+venv/
+
+# Ignore the instance folder (Flask's default instance folder for configuration and instance-specific data)
+instance/
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore IDE/editor specific files
+.vscode/
+.idea/
+
+# Ignore other common files
+*.log
+*.sqlite3
+*.db
