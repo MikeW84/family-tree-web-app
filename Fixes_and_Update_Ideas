@@ -1,0 +1,12 @@
+Family Tree App issues, To Do list
+
+1. Figure out how to deal with multiple spouses
+2. Change "birth date" to be more indicative of birth/death year
+3. Change anniversary to marriage year or delete it entirely
+4. Create a dedicated page for each family member that includes all their data
+5. Add images of each family member and display them on the family tree
+6. Change connectors so that the first go straight down from parent (half the distance to the next row down), then straight horizontal to above the connected child, then straight down to the child
+7. Make names bold or maybe larger text for better legibility
+8. Delete unnecessary columns in the display family members table
+9. Color code different generations?
+10. Add back in extra spacing (40 instead of 20px) so spouse's names with parenthases don't run outside boxes

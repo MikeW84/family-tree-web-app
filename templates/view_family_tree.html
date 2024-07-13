@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Family Tree</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        #tree {
+            width: 100%;
+            height: 100%;
+        }
+        .node rect {
+            fill: #fff;
+            stroke: #000;
+        }
+        .node text {
+            text-anchor: middle;
+        }
+        .link {
+            fill: none;
+            stroke: #000;
+            stroke-width: 1.5px;
+        }
+    </style>
+</head>
+<body>
+    <a href="{{ url_for('index') }}" class="back-link">Back to Main Menu</a>
+    <div id="tree"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/api/members')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Error fetching data:', data.error);
+                        document.getElementById('tree').innerHTML = 'Error loading family tree.';
+                        return;
+                    }
+                    if (data.length === 0) {
+                        document.getElementById('tree').innerHTML = 'No family members found.';
+                        return;
+                    }
+
+                    // Check for multiple root nodes
+                    const rootMembers = data.filter(member => !member.parent_id);
+                    if (rootMembers.length > 1) {
+                        console.error('Error: multiple family members do not have a parent assigned.');
+                        document.getElementById('tree').innerHTML = 'Error: multiple family members do not have a parent assigned.';
+                        return;
+                    }
+
+                    try {
+                        const width = window.innerWidth;
+                        const height = window.innerHeight;
+
+                        // Create the SVG element
+                        const svg = d3.select("#tree")
+                            .append("svg")
+                            .attr("width", width)
+                            .attr("height", height);
+
+                        const g = svg.append("g");
+
+                        // Add zoom behavior
+                        const zoom = d3.zoom()
+                            .on("zoom", function (event) {
+                                g.attr("transform", event.transform);
+                            });
+
+                        svg.call(zoom);
+
+                        // Create a hierarchical layout using the stratify function
+                        const root = d3.stratify()
+                            .id(d => d.id)
+                            .parentId(d => d.parent_id ? d.parent_id : null)(data);
+
+                        // Create the tree layout with additional vertical spacing
+                        const treeLayout = d3.tree().nodeSize([0, 140]); // 100 + 40 extra pixels for spacing
+                        treeLayout(root);
+
+                        // Calculate the width for each node based on the longest name
+                        root.each(function(d) {
+                            const name = `${d.data.first_name} ${d.data.middle_name || ''} ${d.data.last_name} ${d.data.suffix || ''}`;
+                            const spouse = d.data.spouse ? `(${d.data.spouse})` : '';
+                            const longestName = name.length > spouse.length ? name : spouse;
+                            d.data.width = Math.max(longestName.length * 7 + 40, 120);  // Dynamically set box width based on longest text length with padding
+                        });
+
+                        // Helper function to calculate the total width of the child nodes
+                        function calculateTotalWidth(node) {
+                            if (node.children && node.children.length > 0) {
+                                let totalWidth = 0;
+                                node.children.forEach(child => {
+                                    totalWidth += calculateTotalWidth(child) + 20; // Add spacing between sibling nodes
+                                });
+                                totalWidth -= 20; // Remove extra spacing after the last child
+                                node.data.totalWidth = totalWidth;
+                                return totalWidth;
+                            } else {
+                                node.data.totalWidth = node.data.width;
+                                return node.data.width;
+                            }
+                        }
+
+                        // Calculate the total width for each node
+                        calculateTotalWidth(root);
+
+                        // Helper function to calculate the x-positions of the nodes and center children below parents
+                        function calculateXPositions(node) {
+                            if (node.children && node.children.length > 0) {
+                                let totalWidth = 0;
+                                node.children.forEach(child => {
+                                    calculateXPositions(child);
+                                    totalWidth += child.data.totalWidth + 20; // Add spacing between sibling nodes
+                                });
+                                totalWidth -= 20; // Remove extra spacing after the last child
+                                node.data.totalWidth = Math.max(node.data.width, totalWidth);
+                                let currentX = node.x - totalWidth / 2;
+                                node.children.forEach(child => {
+                                    child.x = currentX + child.data.totalWidth / 2;
+                                    currentX += child.data.totalWidth + 20;
+                                });
+                            }
+                        }
+
+                        // Calculate the initial x-positions of the nodes
+                        root.x = width / 2;
+                        calculateXPositions(root);
+
+                        // Adjust the x-positions of the child nodes to be centered below their parent
+                        function centerChildren(node) {
+                            if (node.children && node.children.length > 0) {
+                                let totalWidth = node.children.reduce((sum, child) => sum + child.data.totalWidth + 20, -20);
+                                let currentX = node.x - totalWidth / 2;
+                                node.children.forEach(child => {
+                                    child.x = currentX + child.data.totalWidth / 2;
+                                    currentX += child.data.totalWidth + 20;
+                                    centerChildren(child);
+                                });
+                            }
+                        }
+
+                        // Apply the centering function to all nodes
+                        centerChildren(root);
+
+                        // Add links (lines) between nodes with only vertical and horizontal segments
+                        const link = g.selectAll(".link")
+                            .data(root.links())
+                            .enter()
+                            .append("path")
+                            .attr("class", "link")
+                            .attr("d", d => {
+                                const midY = (d.source.y + d.target.y) / 2;
+                                return `
+                                    M${d.source.x},${d.source.y}
+                                    V${midY}
+                                    H${d.target.x}
+                                    V${d.target.y}
+                                `;
+                            });
+
+                        // Add nodes (groups) for each family member
+                        const node = g.selectAll(".node")
+                            .data(root.descendants())
+                            .enter()
+                            .append("g")
+                            .attr("class", "node")
+                            .attr("transform", d => `translate(${d.x},${d.y})`);
+
+                        // Add a rectangle for each node
+                        node.append('rect')
+                            .attr('x', d => -d.data.width / 2)
+                            .attr('y', -30)
+                            .attr('width', d => d.data.width)
+                            .attr('height', d => d.data.spouse ? 80 : 60)
+                            .attr('fill', '#fff')
+                            .attr('stroke', '#000');
+
+                        // Add text for the name
+                        node.append('text')
+                            .attr('dy', '-10')
+                            .text(d => `${d.data.first_name} ${d.data.middle_name || ''} ${d.data.last_name} ${d.data.suffix || ''}`);
+
+                        // Add text for the birth date
+                        node.append('text')
+                            .attr('dy', '20')
+                            .style('font-style', 'italic')
+                            .text(d => d.data.birth_date);
+
+                        // Add text for the spouse
+                        node.append('text')
+                            .attr('dy', '40')
+                            .text(d => d.data.spouse ? `(${d.data.spouse})` : '');
+
+                        // Calculate the initial transform to fit the tree in the view
+                        const bounds = g.node().getBBox();
+                        const fullWidth = bounds.width;
+                        const fullHeight = bounds.height;
+                        const scale = Math.min(width / fullWidth, height / fullHeight);
+                        const translateX = (width - fullWidth * scale) / 2 - bounds.x * scale;
+                        const translateY = (height - fullHeight * scale) / 2 - bounds.y * scale;
+
+                        // Apply the initial transform
+                        svg.call(zoom.transform, d3.zoomIdentity.translate(translateX, translateY).scale(scale));
+
+                        // Update SVG size on window resize
+                        window.addEventListener('resize', () => {
+                            const newWidth = window.innerWidth;
+                            const newHeight = window.innerHeight;
+                            svg.attr("width", newWidth).attr("height", newHeight);
+                        });
+                    } catch (error) {
+                        console.error('Error processing data:', error);
+                        document.getElementById('tree').innerHTML = 'Error processing family tree data.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    document.getElementById('tree').innerHTML = 'Error loading family tree.';
+                });
+        });
+    </script>
+</body>
+</html>

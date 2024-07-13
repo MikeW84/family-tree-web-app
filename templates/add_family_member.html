@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Family Member</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <a href="{{ url_for('index') }}" class="back-link">Back to Main Menu</a>
+    <h1>Add Family Member</h1>
+    <div class="form-container">
+        <form method="POST" enctype="multipart/form-data">
+            <label>First Name:</label>
+            <input type="text" name="first_name" required><br>
+            <label>Middle Name:</label>
+            <input type="text" name="middle_name"><br>
+            <label>Last Name:</label>
+            <input type="text" name="last_name" required><br>
+            <label>Suffix:</label>
+            <input type="text" name="suffix"><br>
+            <label>Birth Date:</label>
+            <input type="text" name="birth_date"><br>
+            <label>Parent:</label>
+            <select name="parent_id">
+                <option value="">Select Parent</option>
+                {% for member in members %}
+                    <option value="{{ member.id }}">{{ member.first_name }} {{ member.middle_name }} {{ member.last_name }} {{ member.suffix }}</option>
+                {% endfor %}
+            </select><br>
+            <label>Spouse:</label>
+            <input type="text" name="spouse"><br>
+            <label>Wedding Anniversary:</label>
+            <input type="text" name="wedding_anniversary"><br>
+            <label>Bio:</label>
+            <textarea name="bio"></textarea><br>
+            <label>Favorite Westport Memories:</label>
+            <textarea name="favorite_memories"></textarea><br>
+            <label>Image File:</label>
+            <input type="file" name="image_file"><br>
+            <button type="submit">Save</button>
+            <button type="button" onclick="window.location.href='{{ url_for('index') }}'">Cancel</button>
+        </form>
+    </div>
+</body>
+</html>

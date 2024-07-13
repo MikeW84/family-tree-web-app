@@ -1,0 +1,130 @@
+/* File: static/style.css */
+
+/* General Body Styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to bottom, #b3d9ff, #e6f7ff); /* Light blue gradient background */
+    background-size: cover;
+    background-repeat: no-repeat;
+    color: #333; /* Dark text for readability */
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+/* Header Styling */
+h1 {
+    color: #004d99; /* Dark blue color for header */
+    font-size: 2.5em;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Link Styling */
+a {
+    text-decoration: none;
+    font-size: 1.2em;
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Main Menu Specific Styling */
+.main-menu h1 {
+    color: #004d99; /* Dark blue color for header */
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+
+.main-menu ul {
+    list-style-type: none;
+    padding: 0;
+    text-align: center;
+}
+
+.main-menu ul li {
+    margin: 10px 0;
+}
+
+.main-menu a {
+    color: #004d99; /* Dark blue */
+    font-weight: bold;
+    background-color: #80c1ff; /* Light blue background */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.main-menu a:hover {
+    background-color: #004d99; /* Dark blue on hover */
+    color: #fff; /* White text on hover */
+}
+
+/* Specific Styling for Back Link */
+.back-link {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: #80c1ff; /* Light blue background */
+    color: #004d99; /* Dark blue */
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.back-link:hover {
+    background-color: #004d99; /* Dark blue on hover */
+    color: #fff; /* White text on hover */
+}
+
+/* Form Styling */
+.form-container {
+    width: 100%;
+    max-width: 600px;
+    margin: auto;
+    background: #f2f2f2; /* Light grey background */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+form {
+    width: 100%;
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+    color: #004d99; /* Dark blue */
+}
+
+input[type="text"], textarea, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    color: #333;
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 15px;
+    background-color: #004d99; /* Dark blue */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #003366; /* Darker blue on hover */
+}

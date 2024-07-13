@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Display Family Members</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <a href="{{ url_for('index') }}">Back to Main Menu</a>
+    <h1>Family Members</h1>
+    <table>
+        <tr>
+            <th>First Name</th>
+            <th>Middle Name</th>
+            <th>Last Name</th>
+            <th>Suffix</th>
+            <th>Birth Date</th>
+            <th>Parent</th>
+            <th>Spouse</th>
+            <th>Wedding Anniversary</th>
+            <th>Bio</th>
+            <th>Favorite Memories</th>
+            <th>Image</th>
+        </tr>
+        {% for member in members %}
+        <tr>
+            <td>{{ member.first_name }}</td>
+            <td>{{ member.middle_name }}</td>
+            <td>{{ member.last_name }}</td>
+            <td>{{ member.suffix }}</td>
+            <td>{{ member.birth_date }}</td>
+            <td>{% if member.parent_id %}{{ member.parent.first_name }} {{ member.parent.middle_name }} {{ member.parent.last_name }} {{ member.parent.suffix }}{% endif %}</td>
+            <td>{{ member.spouse }}</td>
+            <td>{{ member.wedding_anniversary }}</td>
+            <td>{{ member.bio }}</td>
+            <td>{{ member.favorite_memories }}</td>
+            <td>{% if member.image_file %}<img src="{{ url_for('static', filename=member.image_file) }}" width="100">{% endif %}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

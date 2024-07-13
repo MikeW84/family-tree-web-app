@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Family Member</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <a href="{{ url_for('index') }}" class="back-link">Back to Main Menu</a>
+    <h1>Edit Family Member</h1>
+    <div class="form-container">
+        <form method="POST" enctype="multipart/form-data">
+            <label>Select Family Member:</label>
+            <select name="member_id" onchange="this.form.submit()">
+                <option value="">Select</option>
+                {% for member in members %}
+                    <option value="{{ member.id }}">{{ member.last_name }}, {{ member.first_name }} {{ member.middle_name }} {{ member.suffix }}</option>
+                {% endfor %}
+            </select>
+        </form>
+        {% if member %}
+        <form method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="member_id_hidden" value="{{ member.id }}">
+            <label>First Name:</label>
+            <input type="text" name="first_name" value="{{ member.first_name }}" required><br>
+            <label>Middle Name:</label>
+            <input type="text" name="middle_name" value="{{ member.middle_name }}"><br>
+            <label>Last Name:</label>
+            <input type="text" name="last_name" value="{{ member.last_name }}" required><br>
+            <label>Suffix:</label>
+            <input type="text" name="suffix" value="{{ member.suffix }}"><br>
+            <label>Birth Date:</label>
+            <input type="text" name="birth_date" value="{{ member.birth_date }}"><br>
+            <label>Parent:</label>
+            <select name="parent_id">
+                <option value="">Select Parent</option>
+                {% for m in members %}
+                    <option value="{{ m.id }}" {% if member.parent_id == m.id %}selected{% endif %}>{{ m.first_name }} {{ m.middle_name }} {{ m.last_name }} {{ m.suffix }}</option>
+                {% endfor %}
+            </select><br>
+            <label>Spouse:</label>
+            <input type="text" name="spouse" value="{{ member.spouse }}"><br>
+            <label>Wedding Anniversary:</label>
+            <input type="text" name="wedding_anniversary" value="{{ member.wedding_anniversary }}"><br>
+            <label>Bio:</label>
+            <textarea name="bio">{{ member.bio }}</textarea><br>
+            <label>Favorite Westport Memories:</label>
+            <textarea name="favorite_memories">{{ member.favorite_memories }}</textarea><br>
+            <label>Image File:</label>
+            <input type="file" name="image_file"><br>
+            <button type="submit">Save</button>
+            <button type="button" onclick="window.location.href='{{ url_for('index') }}'">Cancel</button>
+        </form>
+        {% endif %}
+    </div>
+</body>
+</html>
